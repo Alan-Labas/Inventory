@@ -3,16 +3,16 @@ services:
     image: mysql:8.0
     container_name: app-mysql
     environment:
-      MYSQL_DATABASE: appdb
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: apppass
-      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: db_inventory
+      MYSQL_USER: alanlabas
+      MYSQL_PASSWORD: Smetar245
+      MYSQL_ROOT_PASSWORD: Smetar245
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpass"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pSmetar245"]
       interval: 5s
       timeout: 3s
       retries: 30
@@ -20,12 +20,13 @@ services:
   backend:
     build:
       context: ./backend
-    container_name: app-backend
+    container_name: backend-inventory
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/appdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: appuser
-      SPRING_DATASOURCE_PASSWORD: apppass
+      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/db_inventory?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+      SPRING_DATASOURCE_USERNAME: alanlabas
+      SPRING_DATASOURCE_PASSWORD: Smetar245
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8080:8080"
     depends_on:
@@ -34,8 +35,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-    container_name: app-frontend
+      context: ./frontend/inventory-frontend
+    container_name: frontend-inventory
     ports:
       - "5173:80"
     depends_on:
