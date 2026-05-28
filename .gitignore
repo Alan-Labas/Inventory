@@ -1,0 +1,13 @@
+# Environment files - never commit these
+Backend/.env
+.env
+
+# IDE
+.idea/
+*.iml
+
+# Maven
+Backend/target/
+
+# OS
+.DS_Store

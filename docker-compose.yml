@@ -2,31 +2,25 @@ services:
   db:
     image: mysql:8.0
     container_name: app-mysql
-    environment:
-      MYSQL_DATABASE: db_inventory
-      MYSQL_USER: alanlabas
-      MYSQL_PASSWORD: Smetar245
-      MYSQL_ROOT_PASSWORD: Smetar245
+    env_file:
+      - ./Backend/.env
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./sql/db_inventory.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pSmetar245"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 3s
       retries: 30
 
   backend:
     build:
-      context: ./backend
+      context: ./Backend
     container_name: backend-inventory
-    environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/db_inventory?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
-      SPRING_DATASOURCE_USERNAME: alanlabas
-      SPRING_DATASOURCE_PASSWORD: Smetar245
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_PROFILES_ACTIVE: docker
+    env_file:
+      - ./Backend/.env
     ports:
       - "8080:8080"
     depends_on:
