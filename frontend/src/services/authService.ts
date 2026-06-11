@@ -1,4 +1,4 @@
-import type { LoginRequest, LoginResponse, RegisterRequest } from '../dto/auth.ts'
+import type { LoginRequest, LoginResponse, RegisterRequest, changePasswordRequest } from '../dto/auth.ts'
 import { api } from './api.ts'
 
 export const register = async (data: RegisterRequest): Promise<string> => {
@@ -8,5 +8,10 @@ export const register = async (data: RegisterRequest): Promise<string> => {
 
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await api.post('/auth/login', data)
+  return response.data
+}
+
+export const changePassword = async (data: changePasswordRequest): Promise<string> =>{
+  const response = await api.put('/user/changePassword', data)
   return response.data
 }
