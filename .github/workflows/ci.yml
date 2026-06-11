@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend-tests:
+    name: Backend tests
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: db_inventory
+          MYSQL_USER: ci
+          MYSQL_PASSWORD: ci
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=30
+    env:
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/db_inventory?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      MYSQL_USER: ci
+      MYSQL_PASSWORD: ci
+      JWT_SECRET: ci-only-secret-not-used-in-production-0123456789abcdef0123456789
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Run tests
+        working-directory: Backend
+        run: mvn -B test
+
+  frontend-build:
+    name: Frontend lint & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+  # Builds production Docker images and publishes them to GitHub Container
+  # Registry — only for pushes to main, and only after tests pass.
+  docker-images:
+    name: Build & push production images
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: Backend
+          push: true
+          tags: |
+            ghcr.io/alan-labas/inventory-backend:latest
+            ghcr.io/alan-labas/inventory-backend:${{ github.sha }}
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: true
+          tags: |
+            ghcr.io/alan-labas/inventory-frontend:latest
+            ghcr.io/alan-labas/inventory-frontend:${{ github.sha }}
