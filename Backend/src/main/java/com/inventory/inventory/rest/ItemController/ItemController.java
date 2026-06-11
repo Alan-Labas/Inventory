@@ -2,8 +2,10 @@ package com.inventory.inventory.rest.ItemController;
 
 import com.inventory.inventory.dao.ItemDao.ItemDao;
 import com.inventory.inventory.vao.item.Item;
+import com.inventory.inventory.vao.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,12 +16,12 @@ public class ItemController {
     private ItemDao itemDao;
 
     @PostMapping("/addItem")
-    public ResponseEntity<?> addItem(@RequestBody Item item){
-        item.setName(item.getName());
-        item.setCategory(item.getCategory());
-        item.setBarcode(item.getBarcode());
-        item.setHousehold(item.getHousehold());
-        item.setPet(item.getPet());
+    public ResponseEntity<?> addItem(@RequestBody Item item, @AuthenticationPrincipal User user){
+        if (user.getHousehold() == null) {
+            return ResponseEntity.badRequest().body("Join or create a household first");
+        }
+        // the household always comes from the logged-in user, never from the client
+        item.setHousehold(user.getHousehold());
 
         itemDao.save(item);
         return ResponseEntity.ok("Item added successfully");
@@ -27,8 +29,11 @@ public class ItemController {
     }
 
     @GetMapping("/getItems")
-    public ResponseEntity<?> getItems(){
-        return ResponseEntity.ok(itemDao.findAll());
+    public ResponseEntity<?> getItems(@AuthenticationPrincipal User user){
+        if (user.getHousehold() == null) {
+            return ResponseEntity.ok(java.util.List.of());
+        }
+        return ResponseEntity.ok(itemDao.findByHousehold(user.getHousehold()));
     }
 
     @GetMapping("/getByName")

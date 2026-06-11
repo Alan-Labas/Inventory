@@ -1,5 +1,5 @@
 export type LoginRequest = {
-  email: string
+  identifier: string
   password: string
 }
 
@@ -16,4 +16,9 @@ export type LoginResponse = {
   token: string
   email: string
   name: string
+}
+
+export type changePasswordRequest = {
+  oldPassword: string
+  newPassword: string
 }
