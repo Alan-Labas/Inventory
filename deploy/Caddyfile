@@ -1,0 +1,6 @@
+# Caddy fetches and renews Let's Encrypt certificates automatically
+# for the domain in $DOMAIN. All traffic is forwarded to the frontend
+# nginx container, which serves the app and proxies /api to the backend.
+{$DOMAIN} {
+	reverse_proxy frontend:80
+}
