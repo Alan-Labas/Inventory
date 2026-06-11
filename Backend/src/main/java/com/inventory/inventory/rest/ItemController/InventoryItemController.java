@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/inventoryItem")
-@CrossOrigin(origins = "http://localhost:3000")
 public class InventoryItemController {
 
     @Autowired

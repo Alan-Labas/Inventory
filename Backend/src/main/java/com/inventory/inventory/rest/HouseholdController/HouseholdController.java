@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/household")
-@CrossOrigin(origins = "http://localhost:3000")
 public class HouseholdController {
     @Autowired
     private HouseholdDao householdDao;
