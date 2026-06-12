@@ -10,23 +10,18 @@ type Status = 'loading' | 'ok' | 'error'
 export function ConfirmEmailPage() {
   const [params] = useSearchParams()
   const token = params.get('token')
-  const [status, setStatus] = useState<Status>('loading')
+  const [status, setStatus] = useState<Status>(token ? 'loading' : 'error')
   // The confirmation token is single-use, so guard against StrictMode's
   // double effect run in dev (which would consume it twice).
   const requested = useRef(false)
 
   // Runs once when the page opens (the user just clicked the email link).
   useEffect(() => {
-    if (requested.current) return
+    if (!token || requested.current) return
     requested.current = true
-
-    if (!token) {
-      setStatus('error')
-      return
-    }
     confirmEmail(token)
-      .then(() => setStatus('ok'))
-      .catch(() => setStatus('error'))
+        .then(() => setStatus('ok'))
+        .catch(() => setStatus('error'))
   }, [token])
 
   return (
