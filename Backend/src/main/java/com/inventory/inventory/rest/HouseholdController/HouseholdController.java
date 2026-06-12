@@ -76,4 +76,23 @@ public class HouseholdController {
 
         return ResponseEntity.ok(household);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> leaveFromHousehold(@PathVariable UUID id, @AuthenticationPrincipal User user){
+        Household household = householdDao.findById(id).orElse(null);
+
+        if (household == null) {
+            return ResponseEntity.badRequest().body("Household not found");
+        }
+
+        if(!household.getHouseholdID().equals(user.getHousehold().getHouseholdID())){
+            return ResponseEntity.badRequest().body("You are not a member of this household");
+        }
+
+        user.setHousehold(null);
+        userDao.save(user);
+
+        return ResponseEntity.ok("You have left the household");
+
+    }
 }

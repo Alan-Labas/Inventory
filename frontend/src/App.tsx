@@ -11,6 +11,7 @@ import { LoginPage } from './pages/LoginPage.tsx'
 import { PlaceholderPage } from './pages/PlaceholderPage.tsx'
 import { RegisterPage } from './pages/RegisterPage.tsx'
 import {SettingsPage} from "./pages/SettingsPage.tsx";
+import {ConfirmEmailPage} from "./pages/ConfirmEmailPage.tsx";
 
 // Logged-in users who open /login or /register go straight to the app.
 function PublicOnly({ children }: { children: React.ReactNode }) {
@@ -26,8 +27,8 @@ function App() {
           <Routes>
             <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
             <Route path="/register" element={<PublicOnly><RegisterPage /></PublicOnly>} />
-
-            <Route element={<ProtectedRoute />}>
+            <Route path="/confirm-email" element={<PublicOnly><ConfirmEmailPage /></PublicOnly>} />
+            <Route element={<ProtectedRoute />}>npm
               <Route element={<AppLayout />}>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/items" element={<ItemsPage />} />
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/pets" element={<PetsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Route>
+
             </Route>
           </Routes>
         </BrowserRouter>

@@ -23,3 +23,13 @@ export const addInventoryItem = async (data: AddInventoryItemRequest): Promise<s
   const response = await api.post('/inventoryItem/addInventoryItem', data)
   return response.data
 }
+
+export const deleteItem = async (itemID: string): Promise<string> => {
+  const response = await api.delete('/item/' +itemID)
+  return response.data
+}
+
+export const deleteItemFromInventory = async (inventoryItemID: string): Promise<string> => {
+  const response = await api.delete('/inventoryItem/'+inventoryItemID)
+  return response.data
+}

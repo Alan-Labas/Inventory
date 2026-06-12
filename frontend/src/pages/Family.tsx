@@ -1,10 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { AlertCircle, Copy, Home, UserPlus, Users } from 'lucide-react'
+import { AlertCircle, Copy, Home, UserPlus, Users, Trash } from 'lucide-react'
 import { isAxiosError } from 'axios'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { buttonClass, cardClass, inputClass, labelClass } from '../components/ui.ts'
 import type { Household } from '../domain/household.ts'
 import * as householdService from '../services/householdService.ts'
+import { useHousehold} from '../hooks/useHousehold.ts'
 
 export function FamilyPage() {
   const [household, setHousehold] = useState<Household | null>(null)
@@ -15,6 +16,8 @@ export function FamilyPage() {
   const [inviteCode, setInviteCode] = useState('')
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
+
+  const {leaveFromHousehold} = useHousehold()
 
   useEffect(() => {
     householdService
@@ -60,6 +63,15 @@ export function FamilyPage() {
     setTimeout(() => setCopied(false), 1500)
   }
 
+  const onLeave = async (householdID: string) => {
+    try{
+      await leaveFromHousehold(householdID)
+      setHousehold(null)
+    }catch (err) {
+      submitError(err, 'Could not leave the household')
+    }
+  }
+
   return (
     <>
       <div className="mb-6 flex items-center justify-between gap-3">
@@ -99,6 +111,10 @@ export function FamilyPage() {
             >
               <Copy size={15} />
               {copied ? 'Copied!' : 'Copy'}
+            </button>
+            <button  type="button" className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-sm text-muted transition-colors duration-200 hover:bg-surface-hover hover:text-fg"
+                    onClick={() => onLeave(household.householdID)}>
+              <Trash size={15} />
             </button>
           </div>
         </div>

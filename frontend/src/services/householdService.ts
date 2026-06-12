@@ -16,3 +16,9 @@ export const joinHousehold = async (inviteCode: string): Promise<Household> => {
   const response = await api.post('/household/join', { inviteCode })
   return response.data
 }
+
+
+export const leaveFromHousehold = async (householdID: string): Promise<string> => {
+  const response = await api.delete('/household/' + householdID)
+  return response.data
+}

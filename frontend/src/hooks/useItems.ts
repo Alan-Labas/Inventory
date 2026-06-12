@@ -51,5 +51,21 @@ export function useItems() {
     [refresh],
   )
 
-  return { items, inventory, loading, error, refresh, addItem, addInventoryItem }
+  const deleteItemFromInventory = useCallback(
+      async (inventoryID: string) => {
+        await itemService.deleteItemFromInventory(inventoryID)
+        await refresh()
+      },
+      [refresh],
+  )
+
+  const deleteItem = useCallback(
+      async (itemID: string) => {
+        await itemService.deleteItem(itemID)
+        await refresh()
+      },
+      [refresh],
+  )
+
+  return { items, inventory, loading, error, refresh, addItem, addInventoryItem, deleteItem, deleteItemFromInventory }
 }

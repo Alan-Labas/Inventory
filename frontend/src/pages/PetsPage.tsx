@@ -4,12 +4,12 @@ import { isAxiosError } from 'axios'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { buttonClass, cardClass, inputClass, labelClass } from '../components/ui.ts'
 import {usePets} from "../hooks/usePets.ts";
-import {AlertCircle, Plus} from "lucide-react";
+import {AlertCircle, Plus, Trash} from "lucide-react";
 
 const fieldClass = 'flex min-w-0 flex-col gap-1.5'
 
 export function PetsPage() {
-  const { pets,  loading, error, addPet } = usePets()
+  const { pets,  loading, error, addPet, deletePet } = usePets()
 
   // "Add pet" form (the catalog entry: what a product is)
     const [name, setName] = useState('')
@@ -37,17 +37,27 @@ export function PetsPage() {
         setSpecies('')
         setDailyConsumption('')
     } catch (err) {
-      submitError(err, 'Could not add the item')
+      submitError(err, 'Could not add the pet')
     } finally {
       setSaving(false)
     }
   }
+
+
+  const onDelet = async (petID: string) => {
+    try{
+      await deletePet(petID)
+    }catch (err) {
+      submitError(err, 'Could not delete the pet')
+    }
+  }
+
   return (
     <>
       <div className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Items</h1>
-          <p className="mt-1 text-[15px] text-muted">Your product catalog and current stock</p>
+          <h1 className="text-2xl font-bold">Pets</h1>
+          <p className="mt-1 text-[15px] text-muted">Your pets</p>
         </div>
         <ThemeToggle />
       </div>
@@ -68,20 +78,20 @@ export function PetsPage() {
           </h2>
           <div className="flex flex-col gap-3">
             <div className={fieldClass}>
-              <label htmlFor="item-name" className={labelClass}>Name</label>
-              <input id="item-name" required className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
+              <label htmlFor="pet-name" className={labelClass}>Name</label>
+              <input id="pet-name" required className={inputClass} value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className={fieldClass}>
-              <label htmlFor="item-barcode" className={labelClass}>Species</label>
-              <input id="item-barcode" required className={inputClass} value={species} onChange={(e) => setSpecies(e.target.value)} />
+              <label htmlFor="species" className={labelClass}>Species</label>
+              <input id="species" required className={inputClass} value={species} onChange={(e) => setSpecies(e.target.value)} />
             </div>
               <div className={fieldClass}>
-              <label htmlFor="item-barcode" className={labelClass}>Breed</label>
-              <input id="item-barcode" required className={inputClass} value={breed} onChange={(e) => setBreed(e.target.value)} />
+              <label htmlFor="breed" className={labelClass}>Breed</label>
+              <input id="breed" required className={inputClass} value={breed} onChange={(e) => setBreed(e.target.value)} />
             </div>
               <div className={fieldClass}>
-              <label htmlFor="item-barcode" className={labelClass}>Daily consumption</label>
-              <input id="item-barcode" required className={inputClass} value={dailyConsumption} onChange={(e) => setDailyConsumption(e.target.value)} />
+              <label htmlFor="daily-consumption" className={labelClass}>Daily consumption</label>
+              <input id="daily-consumption" required className={inputClass} value={dailyConsumption} onChange={(e) => setDailyConsumption(e.target.value)} />
             </div>
             <button type="submit" className={buttonClass} disabled={saving}>
               {saving ? 'Adding…' : 'Add pet'}
@@ -100,12 +110,17 @@ export function PetsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
-          {pets.map((pets) => (
-            <div className={cardClass} key={pets.petID}>
-              <h3 className="font-semibold">{pets.name}</h3>
-              <p className="mt-1 text-sm text-muted">Species: {pets.species}</p>
-              <p className="mt-1 text-sm text-muted">Breed: {pets.breed}</p>
-                <p className="mt-1 text-sm text-muted">Daily consumption: {pets.dailyConsumption}</p>
+          {pets.map((pet) => (
+            <div className={cardClass} key={pet.petID}>
+
+              <h3 className="font-semibold">{pet.name}</h3>
+              <p className="mt-1 text-sm text-muted">Species: {pet.species}</p>
+              <p className="mt-1 text-sm text-muted">Breed: {pet.breed}</p>
+                <p className="mt-1 text-sm text-muted">Daily consumption: {pet.dailyConsumption}</p>
+              <br/>
+              <button type="button" className={buttonClass} onClick={() => onDelet(pet.petID)}>
+                <Trash size={16} className="text-red-600" />
+              </button>
             </div>
           ))}
         </div>

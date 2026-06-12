@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/item")
 public class ItemController {
@@ -56,6 +58,23 @@ public class ItemController {
         }
 
         return ResponseEntity.ok(item);
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteItemById(@PathVariable UUID id, @AuthenticationPrincipal User user){
+        Item  item = itemDao.findById(id).orElse(null);
+
+        if (item == null) {
+            return ResponseEntity.badRequest().body("Item not found");
+        }
+
+        if (!item.getHousehold().getHouseholdID().equals(user.getHousehold().getHouseholdID())) {
+            return ResponseEntity.badRequest().body("You can only delete items from your household");
+        }
+
+        itemDao.deleteById(id);
+        return ResponseEntity.ok("Item deleted successfully");
     }
 
 }

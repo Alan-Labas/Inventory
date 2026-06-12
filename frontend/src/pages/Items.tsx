@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { AlertCircle, PackagePlus, Plus } from 'lucide-react'
+import { AlertCircle, PackagePlus, Plus, Trash } from 'lucide-react'
 import { isAxiosError } from 'axios'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { buttonClass, cardClass, inputClass, labelClass } from '../components/ui.ts'
@@ -8,7 +8,7 @@ import { useItems } from '../hooks/useItems.ts'
 const fieldClass = 'flex min-w-0 flex-col gap-1.5'
 
 export function ItemsPage() {
-  const { items, inventory, loading, error, addItem, addInventoryItem } = useItems()
+  const { items, inventory, loading, error, addItem, addInventoryItem, deleteItem, deleteItemFromInventory } = useItems()
 
   // "Add item" form (the catalog entry: what a product is)
   const [name, setName] = useState('')
@@ -61,6 +61,22 @@ export function ItemsPage() {
       submitError(err, 'Could not add to inventory')
     } finally {
       setSavingInventory(false)
+    }
+  }
+
+  const onDeleteItem = async (itemID: string) => {
+    try{
+      await deleteItem(itemID)
+    }catch (err){
+      submitError(err, 'could not delete this item')
+    }
+  }
+
+  const onDeleteInventoryItem = async (inventoryItemID: string) => {
+    try{
+      await deleteItemFromInventory(inventoryItemID)
+    }catch (err){
+      submitError(err, 'could not delete this item from inventory')
     }
   }
 
@@ -174,6 +190,9 @@ export function ItemsPage() {
               <p className="text-sm text-muted">
                 Expires: {new Date(entry.expiryDate).toLocaleDateString()}
               </p>
+              <button  type="button" className={buttonClass} onClick={() => onDeleteInventoryItem(entry.inventoryItemID)}>
+                <Trash size={16} className="text-red-600" />
+              </button>
             </div>
           ))}
         </div>
@@ -194,6 +213,10 @@ export function ItemsPage() {
               <h3 className="font-semibold">{item.name}</h3>
               <p className="mt-1 text-sm text-muted">Barcode: {item.barcode}</p>
               {item.category && <p className="text-sm text-muted">Category: {item.category.name}</p>}
+              <br/>
+              <button type="button" className={buttonClass} onClick={() => onDeleteItem(item.itemID)}>
+              <Trash size={16} className="text-red-600" />
+              </button>
             </div>
           ))}
         </div>

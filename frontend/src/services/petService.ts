@@ -11,3 +11,9 @@ export const addPet = async (data: petRequest): Promise<string> => {
     const response = await api.post('/pet/addPet', data)
     return response.data
 }
+
+
+export const deletePet = async (petID: string): Promise<string> => {
+    const response = await api.delete('/pet/' + petID)
+    return response.data
+}

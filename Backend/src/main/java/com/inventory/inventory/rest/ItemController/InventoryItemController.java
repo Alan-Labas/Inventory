@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/inventoryItem")
@@ -65,5 +66,21 @@ public class InventoryItemController {
         }
 
         return ResponseEntity.ok(inventoryItem);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteItemFromInventory(@AuthenticationPrincipal User user, @PathVariable UUID id){
+        Inventoryitem inventoryItem = inventoryItemDao.findById(id).orElse(null);
+
+        if(inventoryItem == null){
+            return ResponseEntity.badRequest().body("Inventory item not found");
+        }
+
+        if (!inventoryItem.getItem().getHousehold().getHouseholdID().equals(user.getHousehold().getHouseholdID())) {
+            return ResponseEntity.badRequest().body("You can only delete inventory items from your household");
+        }
+
+        inventoryItemDao.deleteById(id);
+        return ResponseEntity.ok("Inventory item deleted successfully");
     }
 }

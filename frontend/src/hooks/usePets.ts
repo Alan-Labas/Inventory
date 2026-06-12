@@ -39,7 +39,15 @@ export function usePets() {
     [refresh],
   )
 
+  const deletePet = useCallback(
+        async (petID: string) => {
+          await petService.deletePet(petID)
+          await refresh()
+        },
+      [refresh],
+  )
 
 
-  return { pets, loading, error, refresh, addPet,}
+
+  return { pets, loading, error, refresh, addPet, deletePet}
 }

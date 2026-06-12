@@ -61,7 +61,7 @@ public class AuthController {
         message.setTo(user.getEmail());
         message.setSubject("Complete Registration");
         message.setText("To confirm your registration please click on the link: "
-                + "http://localhost:8080/api/auth/confirm-acc?token=" + confirmationToken.getConfirmationToken());
+                + "http://localhost:5173/confirm-email?token=" + confirmationToken.getConfirmationToken());
         emailService.sendEmail(message);
 
         return ResponseEntity.ok("Verify email by the link sent to your email address");
