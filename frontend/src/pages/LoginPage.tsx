@@ -10,7 +10,7 @@ export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -22,7 +22,7 @@ export function LoginPage() {
     setError(null)
     setLoading(true)
     try {
-      await login({ email, password })
+      await login({ identifier, password })
       navigate(from, { replace: true })
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 400) {
@@ -57,15 +57,15 @@ export function LoginPage() {
 
         <form onSubmit={onSubmit}>
           <div className="mb-4 flex flex-col gap-1.5">
-            <label htmlFor="email" className={labelClass}>Email</label>
+            <label htmlFor="identifier" className={labelClass}>Email or username</label>
             <input
-              id="email"
-              type="email"
-              autoComplete="email"
+              id="identifier"
+              type="text"
+              autoComplete="username"
               required
               className={inputClass}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
             />
           </div>
           <div className="mb-4 flex flex-col gap-1.5">

@@ -35,7 +35,7 @@ export function RegisterPage() {
     try {
       await register(form)
       setSuccess(true)
-      setTimeout(() => navigate('/login'), 1200)
+      setTimeout(() => navigate('/login'), 3000)
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 400) {
         setError(typeof err.response.data === 'string' ? err.response.data : 'Registration failed — check your details')
@@ -69,7 +69,7 @@ export function RegisterPage() {
         {success && (
           <div className="mb-4 flex items-center gap-2 rounded-lg bg-success-soft px-3.5 py-3 text-sm text-success" role="status">
             <CheckCircle2 size={18} className="shrink-0" />
-            Account created! Taking you to sign in…
+            Account created! Check your email for the confirmation link, then sign in.
           </div>
         )}
 
