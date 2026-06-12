@@ -27,6 +27,9 @@ services:
     restart: unless-stopped
     env_file:
       - ./Backend/.env
+    # Published so the Vercel frontend can reach the API over the internet.
+    ports:
+      - "8080:8080"
     depends_on:
       db:
         condition: service_healthy
