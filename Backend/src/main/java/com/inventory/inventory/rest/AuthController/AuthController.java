@@ -12,7 +12,6 @@ import com.inventory.inventory.vao.user.User_role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,12 +61,11 @@ public class AuthController {
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
         confirmationTokenDao.save(confirmationToken);
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        message.setSubject("Complete Registration");
-        message.setText("To confirm your registration please click on the link: "
-                + frontendUrl + "/confirm-email?token=" + confirmationToken.getConfirmationToken());
-        emailService.sendEmail(message);
+        emailService.sendEmail(
+                user.getEmail(),
+                "Complete Registration",
+                "To confirm your registration please click on the link: "
+                        + frontendUrl + "/confirm-email?token=" + confirmationToken.getConfirmationToken());
 
         return ResponseEntity.ok("Verify email by the link sent to your email address");
 
