@@ -1,3 +1,5 @@
+import type {Household} from "./household.ts";
+
 export  type user = {
     id: number,
     name: string,
@@ -8,4 +10,5 @@ export  type user = {
     createdAt: Date,
     isActive: boolean,
     role: string,
+    household: Household
 }

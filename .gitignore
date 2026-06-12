@@ -10,4 +10,5 @@ Backend/target/
 
 # OS
 .DS_Store
-.claude
+.claude.env.local
+Backend/.env.local

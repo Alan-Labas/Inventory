@@ -1,0 +1,59 @@
+# Production stack for a single server (e.g. DigitalOcean droplet).
+# Differences from docker-compose.yml:
+#  - nothing is published except Caddy on 80/443 (db & backend stay internal)
+#  - restart policies so containers come back after a reboot
+#  - Caddy terminates HTTPS with automatic Let's Encrypt certificates
+#
+# Usage: DOMAIN=app.example.com docker compose -f docker-compose.prod.yml up -d --build
+# (or put DOMAIN=... in a .env file next to this file)
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    env_file:
+      - ./Backend/.env
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  backend:
+    build:
+      context: ./Backend
+    restart: unless-stopped
+    env_file:
+      - ./Backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+
+volumes:
+  db_data:
+  caddy_data:
+  caddy_config:

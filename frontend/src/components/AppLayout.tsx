@@ -1,15 +1,28 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Calendar, Home, LayoutDashboard, ListTodo, LogOut, Settings, StickyNote, Users } from 'lucide-react'
+import {
+    Calendar,
+    Home,
+    LayoutDashboard,
+    ListTodo,
+    LogOut,
+    PackageOpen,
+    PawPrint,
+    Settings,
+    StickyNote,
+    Users
+} from 'lucide-react'
 import { useAuth } from '../auth/AuthContext.tsx'
 import { ThemeToggle } from './ThemeToggle.tsx'
 import { navLinkActive, navLinkClass, navLinkIdle } from './ui.ts'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/items', label: 'Items', icon: PackageOpen },
   { to: '/family', label: 'Family', icon: Users },
   { to: '/calendar', label: 'Calendar', icon: Calendar },
   { to: '/tasks', label: 'Tasks', icon: ListTodo },
   { to: '/notes', label: 'Notes', icon: StickyNote },
+    {to: '/pets', label: 'Pets', icon: PawPrint}
 ]
 
 const linkClasses = ({ isActive }: { isActive: boolean }) =>
