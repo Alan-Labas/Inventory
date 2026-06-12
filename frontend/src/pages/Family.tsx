@@ -1,41 +1,32 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { AlertCircle, Copy, Home, UserPlus, Users, Trash } from 'lucide-react'
 import { isAxiosError } from 'axios'
 import { ThemeToggle } from '../components/ThemeToggle.tsx'
 import { buttonClass, cardClass, inputClass, labelClass } from '../components/ui.ts'
-import type { Household } from '../domain/household.ts'
-import * as householdService from '../services/householdService.ts'
 import { useHousehold} from '../hooks/useHousehold.ts'
 
 export function FamilyPage() {
-  const [household, setHousehold] = useState<Household | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const {household, loading, error, createHousehold, joinHousehold, leaveFromHousehold} = useHousehold()
 
   const [newName, setNewName] = useState('')
   const [inviteCode, setInviteCode] = useState('')
   const [saving, setSaving] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const {leaveFromHousehold} = useHousehold()
-
-  useEffect(() => {
-    householdService
-      .getMyHousehold()
-      .then(setHousehold)
-      .catch(() => setError('Could not load your household'))
-      .finally(() => setLoading(false))
-  }, [])
+const [formError, setFormError] = useState<string | null>(null)
 
   const submitError = (err: unknown, fallback: string) =>
-    setError(isAxiosError(err) && typeof err.response?.data === 'string' ? err.response.data : fallback)
+    setFormError(
+      isAxiosError(err) && typeof err.response?.data === 'string' ? err.response.data : fallback,
+    )
 
   const onCreate = async (e: FormEvent) => {
     e.preventDefault()
-    setError(null)
+    setFormError(null)
     setSaving(true)
     try {
-      setHousehold(await householdService.createHousehold(newName))
+      await createHousehold(newName)
+      setNewName('')
     } catch (err) {
       submitError(err, 'Could not create the household')
     } finally {
@@ -45,10 +36,11 @@ export function FamilyPage() {
 
   const onJoin = async (e: FormEvent) => {
     e.preventDefault()
-    setError(null)
+    setFormError(null)
     setSaving(true)
     try {
-      setHousehold(await householdService.joinHousehold(inviteCode.trim()))
+      await joinHousehold(inviteCode)
+      setInviteCode('')
     } catch (err) {
       submitError(err, 'Could not join — check the invite code')
     } finally {
@@ -64,9 +56,9 @@ export function FamilyPage() {
   }
 
   const onLeave = async (householdID: string) => {
+    setFormError(null)
     try{
       await leaveFromHousehold(householdID)
-      setHousehold(null)
     }catch (err) {
       submitError(err, 'Could not leave the household')
     }
@@ -82,10 +74,10 @@ export function FamilyPage() {
         <ThemeToggle />
       </div>
 
-      {error && (
+      {error || formError && (
         <div className="mb-4 flex items-center gap-2 rounded-lg bg-danger-soft px-3.5 py-3 text-sm text-danger" role="alert">
           <AlertCircle size={18} className="shrink-0" />
-          {error}
+          {error ?? formError}
         </div>
       )}
 

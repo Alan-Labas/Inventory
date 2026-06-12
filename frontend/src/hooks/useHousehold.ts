@@ -4,7 +4,7 @@ import * as householdService from '../services/householdService.ts'
 
 export function useHousehold() {
     const [household, setHousehold] = useState<Household | null>(null)
-    const [Loading, setLoading] = useState(true)
+    const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     const refresh = useCallback(async () => {
@@ -27,6 +27,22 @@ export function useHousehold() {
     void refresh()
     }, [refresh])
 
+    const createHousehold = useCallback(
+        async(name: string) => {
+            await householdService.createHousehold(name)
+            await refresh()
+        },
+        [refresh],
+    )
+
+    const joinHousehold = useCallback(
+        async(inviteCode: string) => {
+            await householdService.joinHousehold(inviteCode)
+            await refresh()
+        },
+        [refresh],
+    )
+
     const leaveFromHousehold = useCallback(
         async (householdID: string) => {
             await householdService.leaveFromHousehold(householdID)
@@ -36,5 +52,7 @@ export function useHousehold() {
     )
 
 
-    return {leaveFromHousehold, household, Loading, error, refresh}
+
+
+    return {household, loading, error, refresh, createHousehold, joinHousehold, leaveFromHousehold}
 }
