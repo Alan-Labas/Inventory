@@ -10,6 +10,7 @@ import com.inventory.inventory.vao.token.ConfirmationToken;
 import com.inventory.inventory.vao.user.User;
 import com.inventory.inventory.vao.user.User_role;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,6 +37,10 @@ public class AuthController {
     @Autowired
     private EmailService emailService;
 
+    // Base URL of the frontend; used to build the email confirmation link.
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         if (userDao.existsByEmail(request.email())){
@@ -61,7 +66,7 @@ public class AuthController {
         message.setTo(user.getEmail());
         message.setSubject("Complete Registration");
         message.setText("To confirm your registration please click on the link: "
-                + "http://localhost:5173/confirm-email?token=" + confirmationToken.getConfirmationToken());
+                + frontendUrl + "/confirm-email?token=" + confirmationToken.getConfirmationToken());
         emailService.sendEmail(message);
 
         return ResponseEntity.ok("Verify email by the link sent to your email address");
