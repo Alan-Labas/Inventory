@@ -1,6 +1,7 @@
-# Caddy fetches and renews Let's Encrypt certificates automatically
-# for the domain in $DOMAIN. All traffic is forwarded to the frontend
-# nginx container, which serves the app and proxies /api to the backend.
+# Caddy fetches and renews Let's Encrypt certificates automatically for $DOMAIN
+# (e.g. api.family-inventory.me) and reverse-proxies HTTPS traffic to the
+# backend container over the internal docker network. The Vercel frontend
+# calls https://$DOMAIN/api/... so the whole path is encrypted.
 {$DOMAIN} {
-	reverse_proxy frontend:80
+	reverse_proxy backend:8080
 }
