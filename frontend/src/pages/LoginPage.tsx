@@ -27,13 +27,18 @@ export function LoginPage() {
     } catch (err) {
       if (isAxiosError(err) && err.response?.status === 400) {
         setError(typeof err.response.data === 'string' ? err.response.data : 'Invalid email or password')
+      }else if (isAxiosError(err) && err.response?.status === 429) {
+        setError('Too many login attempts. Please wait a few minutes and try again.')
       } else {
         setError('Could not reach the server. Is the backend running?')
       }
+
     } finally {
       setLoading(false)
     }
   }
+
+
 
   return (
     <div className="flex min-h-screen items-center justify-center p-6">

@@ -2,5 +2,5 @@
 # for the domain in $DOMAIN. All traffic is forwarded to the frontend
 # nginx container, which serves the app and proxies /api to the backend.
 {$DOMAIN} {
-	reverse_proxy backend:80
+	reverse_proxy backend:8080
 }
